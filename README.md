@@ -1,85 +1,74 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Приложение Data Table
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Обзор
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Это приложение предоставляет многофункциональную таблицу данных с такими возможностями, как генерация данных, выбор строк, фильтрация, сортировка перетаскиванием, пагинация и сохранение состояния. Оно построено с использованием React на фронтенде и Node.js (Express) на бэкенде.
 
-## Description
+## Функциональности
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Генерация тестовых данных**: Генерирует список тестовых значений от 1 до 1,000,000.
+- **Выбор строк**:
+  - Поддерживает выбор одной или нескольких строк с помощью чекбоксов.
+  - Позволяет выбирать отдельные строки или все сразу.
+- **Фильтрация**:
+  - Реализует функцию поиска с поддержкой пагинации.
+  - Сохраняет порядок сортировки во время фильтрации.
+- **Сортировка перетаскиванием**:
+  - Позволяет сортировать элементы перетаскиванием с использованием `@hello-pangea/dnd`.
+  - Поддерживает изменение порядка элементов.
+- **Сортировка отфильтрованных результатов**:
+  - Сортирует отфильтрованные результаты на бэкенде с использованием функции `searchData`.
+  - Применяет сортировку на основе `sortedOrder`.
+- **Пагинация**:
+  - Реализует пагинацию с 20 элементами на странице.
+  - Использует `react-window` и `InfiniteLoader` для эффективного рендеринга.
+  - Загружает данные при прокрутке.
+- **Сохранение состояния**:
+  - Сохраняет состояние между перезагрузками с использованием API endpoints `/api/selected` и `/api/sortorder`.
+  - Восстанавливает состояние при загрузке страницы.
+- **Хранение на сервере**:
+  - Хранит выбранные элементы и порядок сортировки в памяти сервера с использованием переменных `selectedItems` и `sortedOrder`.
+- **Пагинация в результатах поиска**:
+  - Поддерживает пагинацию в результатах поиска с использованием API `searchData`.
+  - Реализует `limit` и `offset` для постраничного получения данных.
 
-## Project setup
+## Детали реализации
 
-```bash
-$ yarn install
-```
+### Фронтенд
 
-## Compile and run the project
+- **TableRow.tsx & TableHeader.tsx**: Реализуют выбор строк с помощью чекбоксов, поддерживая выбор одной или нескольких строк, а также выбор всех строк.
+- **SearchBar.tsx**: Реализует функцию поиска, обеспечивая ее бесперебойную работу с пагинацией и сохраняя текущий порядок сортировки.
+- **react-window & InfiniteLoader**: Используются для эффективной пагинации, загружая 20 элементов на страницу и подгружая больше данных при прокрутке пользователем.
+- **@hello-pangea/dnd**: Позволяет сортировать строки перетаскиванием в таблице.
 
-```bash
-# development
-$ yarn run start
+### Бэкенд
 
-# watch mode
-$ yarn run start:dev
+- **server/index.js**:
+  - `generateTestData()`: Генерирует тестовые данные.
+  - `searchData(data, searchTerm, sortedOrder, limit, offset)`: Фильтрует данные на основе поискового запроса, применяет сортировку и реализует пагинацию с использованием `limit` и `offset`.
+  - `/api/selected`: API endpoint для сохранения и получения выбранных элементов.
+  - `/api/sortorder`: API endpoint для сохранения и получения порядка сортировки.
+  - Хранение в памяти для `selectedItems` и `sortedOrder` для сохранения состояния на сервере.
 
-# production mode
-$ yarn run start:prod
-```
+## API Endpoints
 
-## Run tests
+- `/api/selected`:
+  - `GET`: Получает список выбранных элементов.
+  - `POST`: Обновляет список выбранных элементов.
+- `/api/sortorder`:
+  - `GET`: Получает текущий порядок сортировки.
+  - `POST`: Обновляет порядок сортировки.
+- `/api/data`:
+  - `GET`: Получает данные с поддержкой пагинации, поиска и сортировки.
 
-```bash
-# unit tests
-$ yarn run test
+## Детали API поиска данных
 
-# e2e tests
-$ yarn run test:e2e
+API endpoint `searchData` в `server/index.js` поддерживает следующие параметры для эффективного получения данных:
 
-# test coverage
-$ yarn run test:cov
-```
+- `data`: Полный набор данных для поиска.
+- `searchTerm`: Поисковый запрос для фильтрации данных.
+- `sortedOrder`: Порядок, в котором данные должны быть отсортированы.
+- `limit`: Максимальное количество элементов для возврата на странице.
+- `offset`: Индекс начального элемента для возврата (для пагинации).
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Этот API обеспечивает правильную пагинацию результатов поиска и сохраняет желаемый порядок сортировки.
