@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { VariableSizeList as List } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { useTable } from '../context/TableContext';
@@ -12,26 +12,16 @@ const DataTable: React.FC = () => {
   const { 
     state, 
     loadMoreItems, 
-    reorderItems, 
-    isItemLoaded,
-    saveState
+    reorderItems,
+    isItemLoaded
   } = useTable();
   
   const { items, loading, hasMore } = state;
-  
   const itemCount = hasMore ? items.length + 1 : items.length;
   
   const handleDragEnd = (result: any) => {
-    if (!result.destination) {
-      return;
-    }
-    
-    reorderItems(
-      result.source.index,
-      result.destination.index
-    );
-    
-    saveState();
+    if (!result.destination) return;
+    reorderItems(result.source.index, result.destination.index);
   };
   
   const getRowHeight = useCallback(() => 56, []);
@@ -45,33 +35,21 @@ const DataTable: React.FC = () => {
       );
     }
     
-    if (index >= items.length) {
-      return null;
-    }
+    if (index >= items.length) return null;
     
     return (
-      <Draggable
-        draggableId={`item-${items[index].id}`}
-        index={index}
-        key={items[index].id}
-      >
-        {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            style={{ ...style, ...provided.draggableProps.style }}
-          >
-            <TableRow item={items[index]} />
-          </div>
-        )}
-      </Draggable>
+      <div style={style}>
+        <TableRow 
+          item={items[index]} 
+          index={index}
+        />
+      </div>
     );
   };
   
   return (
     <div className="flex flex-col w-full max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Таблица данных</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Интерактивная таблица</h1>
       
       <SearchBar />
       
@@ -84,7 +62,7 @@ const DataTable: React.FC = () => {
           </div>
         ) : (
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable
+            <Droppable 
               droppableId="data-table"
               mode="virtual"
               renderClone={(provided, snapshot, rubric) => (
@@ -92,13 +70,22 @@ const DataTable: React.FC = () => {
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
                   ref={provided.innerRef}
+                  className="bg-blue-50 shadow-lg"
                 >
-                  <TableRow item={items[rubric.source.index]} isDragging />
+                  <TableRow 
+                    item={items[rubric.source.index]} 
+                    index={rubric.source.index}
+                    isDragging
+                  />
                 </div>
               )}
             >
               {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
+                <div 
+                  ref={provided.innerRef} 
+                  {...provided.droppableProps}
+                  className="min-h-[500px]"
+                >
                   <InfiniteLoader
                     isItemLoaded={isItemLoaded}
                     itemCount={itemCount}

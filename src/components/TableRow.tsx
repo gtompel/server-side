@@ -1,18 +1,20 @@
 import React, { memo } from 'react';
+import { Draggable } from '@hello-pangea/dnd';
 import { Check, GripVertical } from 'lucide-react';
 import { DataItem } from '../types';
 import { useTable } from '../context/TableContext';
 
 interface TableRowProps {
   item: DataItem;
+  index: number;
   isDragging?: boolean;
 }
 
-const TableRow: React.FC<TableRowProps> = ({ item, isDragging = false }) => {
+const TableRow: React.FC<TableRowProps> = ({ item, index, isDragging = false }) => {
   const { state, toggleItemSelection } = useTable();
   const isSelected = state.selected.has(item.id);
   
-  return (
+  const rowContent = (
     <div 
       className={`
         flex items-center px-4 py-3 border-b border-gray-200 
@@ -31,7 +33,7 @@ const TableRow: React.FC<TableRowProps> = ({ item, isDragging = false }) => {
             }
           `}
           onClick={() => toggleItemSelection(item.id)}
-          aria-label={isSelected ? "Deselect row" : "Select row"}
+          aria-label={isSelected ? "Снять выделение" : "Выделить"}
         >
           {isSelected && <Check size={16} className="text-white" />}
         </button>
@@ -50,7 +52,24 @@ const TableRow: React.FC<TableRowProps> = ({ item, isDragging = false }) => {
       </div>
     </div>
   );
+
+  return (
+    <Draggable draggableId={`item-${item.id}`} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            ...provided.draggableProps.style,
+            opacity: snapshot.isDragging ? 0.8 : 1
+          }}
+        >
+          {rowContent}
+        </div>
+      )}
+    </Draggable>
+  );
 };
 
-// Use memo to prevent unnecessary rerenders
 export default memo(TableRow);
