@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview --host 0.0.0.0",
-    "server": "node server/index.js"
+    "server": "node server/index.cjs"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^16.5.0",
