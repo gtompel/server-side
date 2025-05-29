@@ -1,11 +1,16 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 
 const app = express();
-const PORT = 3001;
+// Render provides the port in an environment variable
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from the dist directory
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // Генерация тестовых данных (от 1 до 1,000,000)
 const generateTestData = () => {
@@ -109,6 +114,11 @@ app.get('/api/sortorder', (req, res) => {
   res.json({ order: sortedOrder });
 });
 
+// Fallback for client-side routing - serve index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Сервер запущен на http://localhost:${PORT}`);
+  console.log(`Сервер запущен на http://0.0.0.0:${PORT}`);
 });
