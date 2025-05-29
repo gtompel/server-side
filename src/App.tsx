@@ -1,4 +1,3 @@
-import React from 'react';
 import { TableProvider } from './context/TableContext';
 import DataTable from './components/DataTable';
 

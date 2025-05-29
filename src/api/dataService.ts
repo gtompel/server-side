@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DataItem } from '../types';
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = '/api';
 
 export const fetchData = async (page: number, limit: number = 20): Promise<{
   data: DataItem[];

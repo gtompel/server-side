@@ -20,7 +20,7 @@ export interface TableState {
 // Table action types
 export type TableAction =
   | { type: 'LOAD_DATA'; payload: { items: DataItem[]; hasMore: boolean; total: number } }
-  | { type: 'APPEND_DATA'; payload: { items: DataItem[] } }
+  | { type: 'APPEND_DATA'; payload: { items: DataItem[]; hasMore: boolean; total: number } }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_HAS_MORE'; payload: boolean }
   | { type: 'SET_PAGE'; payload: number }
@@ -32,3 +32,14 @@ export type TableAction =
   | { type: 'SET_SEARCH_QUERY'; payload: string }
   | { type: 'SET_IS_SEARCHING'; payload: boolean }
   | { type: 'RESET_STATE' };
+
+// Table context type
+export interface TableContextType {
+  state: TableState;
+  dispatch: React.Dispatch<TableAction>;
+  loadMoreItems: (startIndex: number, stopIndex: number) => Promise<void>;
+  toggleItemSelection: (id: number) => Promise<void>;
+  saveState: () => Promise<void>;
+  reorderItems: (startIndex: number, endIndex: number) => Promise<void>;
+  isItemLoaded: (index: number) => boolean;
+}

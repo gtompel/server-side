@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { TableState, TableAction, DataItem } from '../types';
+import { TableState, TableAction, DataItem, TableContextType } from '../types';
 import { 
   fetchData, 
   getSelectedItems, 

@@ -65,7 +65,7 @@ const DataTable: React.FC = () => {
             <Droppable 
               droppableId="data-table"
               mode="virtual"
-              renderClone={(provided, snapshot, rubric) => (
+              renderClone={(provided, _snapshot, rubric) => (
                 <div
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
