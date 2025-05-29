@@ -17,7 +17,7 @@ const DataTable: React.FC = () => {
   } = useTable();
   
   const { items, loading, hasMore } = state;
-  const itemCount = hasMore ? items.length + 1 : items.length;
+  const itemCount = (hasMore ? items.length + 1 : items.length) || 0;
   
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -35,7 +35,7 @@ const DataTable: React.FC = () => {
       );
     }
     
-    if (index >= items.length) return null;
+    if (index >= items.length || !items[index]) return null;
     
     return (
       <div style={style}>
