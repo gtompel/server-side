@@ -109,6 +109,6 @@ app.get('/api/sortorder', (req, res) => {
   res.json({ order: sortedOrder });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);
 });
