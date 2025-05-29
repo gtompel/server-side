@@ -17,6 +17,15 @@ const DataTable: React.FC = () => {
   } = useTable();
   
   const { items, loading, hasMore } = state;
+
+  if (!items || !Array.isArray(items)) {
+      return (
+          <div className="flex justify-center items-center h-64">
+              {loading ? <LoadingIndicator /> : <p>Не удалось загрузить данные.</p>}
+          </div>
+      );
+  }
+
   const itemCount = (hasMore ? items.length + 1 : items.length) || 0;
   
   const handleDragEnd = (result: any) => {
