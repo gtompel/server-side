@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { ArrowDown } from 'lucide-react';
 import DataListItem from './DataListItem';
@@ -17,10 +17,10 @@ interface VirtualizedListProps {
 }
 
 const VirtualizedList: React.FC<VirtualizedListProps> = ({
-  items,
-  hasMore,
-  isLoading,
-  selectedItems,
+  items = [],
+  hasMore = false,
+  isLoading = false,
+  selectedItems = new Set(),
   onToggleSelect,
   onLoadMore,
   onSortEnd
@@ -28,7 +28,7 @@ const VirtualizedList: React.FC<VirtualizedListProps> = ({
   const parentRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
-    count: items.length,
+    count: items?.length || 0,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 48,
     overscan: 5
@@ -62,18 +62,20 @@ const VirtualizedList: React.FC<VirtualizedListProps> = ({
     return () => element?.removeEventListener('scroll', handleScroll);
   }, [hasMore, isLoading, onLoadMore]);
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
-    if (over && active.id !== over.id) {
+    if (over && active.id !== over.id && items?.length > 0) {
       const oldIndex = items.findIndex(item => item.id === active.id);
       const newIndex = items.findIndex(item => item.id === over.id);
       
-      onSortEnd(oldIndex, newIndex);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        onSortEnd(oldIndex, newIndex);
+      }
     }
   };
 
-  if (items.length === 0) {
+  if (!items || items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 bg-gray-50 rounded-md">
         <p className="text-gray-500">Элементы не найдены</p>
@@ -99,21 +101,26 @@ const VirtualizedList: React.FC<VirtualizedListProps> = ({
             items={items.map(item => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            {virtualizer.getVirtualItems().map(virtualRow => (
-              <div
-                key={virtualRow.index}
-                className="absolute top-0 left-0 w-full"
-                style={{
-                  transform: `translateY(${virtualRow.start}px)`,
-                }}
-              >
-                <DataListItem
-                  item={items[virtualRow.index]}
-                  isSelected={selectedItems.has(items[virtualRow.index].id)}
-                  onToggleSelect={onToggleSelect}
-                />
-              </div>
-            ))}
+            {virtualizer.getVirtualItems().map(virtualRow => {
+              const item = items[virtualRow.index];
+              if (!item) return null;
+              
+              return (
+                <div
+                  key={virtualRow.index}
+                  className="absolute top-0 left-0 w-full"
+                  style={{
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  <DataListItem
+                    item={item}
+                    isSelected={selectedItems.has(item.id)}
+                    onToggleSelect={onToggleSelect}
+                  />
+                </div>
+              );
+            })}
           </SortableContext>
         </div>
 

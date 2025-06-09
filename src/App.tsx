@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import debounce from 'lodash.debounce';
 import { arrayMove } from '@dnd-kit/sortable';
 import DataListHeader from './components/DataListHeader';
@@ -39,12 +39,18 @@ function App() {
       setIsLoading(true);
       const response = await fetchData(pageNum, 20, searchValue);
       
-      setItems(prev => pageNum === 0 ? response.items : [...prev, ...response.items]);
-      setTotalItems(response.total);
-      setHasMore(response.hasMore);
-      setPage(pageNum);
+      if (response && response.items) {
+        setItems(prev => pageNum === 0 ? response.items : [...prev, ...response.items]);
+        setTotalItems(response.total || 0);
+        setHasMore(response.hasMore || false);
+        setPage(pageNum);
+      }
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
+      // Устанавливаем безопасные значения по умолчанию при ошибке
+      setItems([]);
+      setTotalItems(0);
+      setHasMore(false);
     } finally {
       setIsLoading(false);
     }
@@ -68,6 +74,8 @@ function App() {
   };
 
   const handleSortEnd = (oldIndex: number, newIndex: number) => {
+    if (!items || items.length === 0) return;
+    
     // Обновляем порядок элементов в массиве
     const newItems = arrayMove(items, oldIndex, newIndex);
     setItems(newItems);
@@ -91,16 +99,25 @@ function App() {
       try {
         // Загружаем выбранные пользователем элементы
         const savedSelections = await getSelections();
-        setSelectedItems(new Set(savedSelections));
+        if (savedSelections && Array.isArray(savedSelections)) {
+          setSelectedItems(new Set(savedSelections));
+        }
         
         // Загружаем порядок сортировки
         const savedSortOrder = await getSortOrder();
-        setLocalSortOrder(savedSortOrder);
+        if (savedSortOrder && Array.isArray(savedSortOrder)) {
+          setLocalSortOrder(savedSortOrder);
+        }
         
         // Загружаем начальные данные
-        loadData(0);
+        await loadData(0);
       } catch (error) {
         console.error('Ошибка инициализации данных:', error);
+        // Устанавливаем безопасные значения по умолчанию
+        setItems([]);
+        setTotalItems(0);
+        setSelectedItems(new Set());
+        setLocalSortOrder([]);
       }
     };
     

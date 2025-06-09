@@ -11,8 +11,8 @@ interface DataListHeaderProps {
 const DataListHeader: React.FC<DataListHeaderProps> = ({ 
   search, 
   onSearchChange, 
-  totalItems,
-  selectedCount
+  totalItems = 0,
+  selectedCount = 0
 }) => {
   return (
     <div className="mb-4 space-y-3">
@@ -21,7 +21,7 @@ const DataListHeader: React.FC<DataListHeaderProps> = ({
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500 flex items-center gap-1">
             <Info size={16} />
-            Всего {totalItems.toLocaleString()} элементов
+            Всего {(totalItems || 0).toLocaleString()} элементов
           </span>
         </div>
       </div>
