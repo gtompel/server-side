@@ -20,12 +20,11 @@ let sortOrder = []
 
 const app = express()
 const PORT = process.env.PORT || 3001
-const HOST = process.env.HOST || "0.0.0.0"
 
 // Применение ограничения скорости
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 минут
-  max: 100, // Ограничение каждого IP до 100 запросов за windowMs
+  max: 1000, // Увеличиваем лимит для продакшен��
   standardHeaders: true,
   legacyHeaders: false,
 })
@@ -33,6 +32,16 @@ const limiter = rateLimit({
 app.use(cors())
 app.use(express.json())
 app.use("/api", limiter)
+
+// Health check endpoint для мониторинга
+app.get("/health", (req, res) => {
+  res.json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+  })
+})
 
 // API маршруты
 app.get("/api/data", (req, res) => {
@@ -112,7 +121,9 @@ app.get("*", (req, res) => {
   res.sendFile(join(distPath, "index.html"))
 })
 
-app.listen(PORT, HOST, () => {
-  console.log(`Сервер запущен на ${HOST}:${PORT}`)
-  console.log(`Приложение доступно по адресу: http://${HOST}:${PORT}`)
+// Запуск сервера с привязкой к 0.0.0.0 для деплоя
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Сервер запущен на 0.0.0.0:${PORT}`)
+  console.log(`📱 Приложение доступно по адресу: http://0.0.0.0:${PORT}`)
+  console.log(`🏥 Health check: http://0.0.0.0:${PORT}/health`)
 })
