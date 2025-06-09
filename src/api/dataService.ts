@@ -1,56 +1,54 @@
-import axios from 'axios';
-import type { DataItem } from '../types';
+import axios from "axios"
 
-const API_URL = import.meta.env.PROD 
-  ? '/.netlify/functions/api'
-  : 'http://localhost:3001/api';
+// Определяем базовый URL API в зависимости от окружения
+const API_URL = "/api"
 
-export const fetchData = async (page: number, limit: number, search: string = '') => {
+export const fetchData = async (page: number, limit: number, search = "") => {
   try {
     const response = await axios.get(`${API_URL}/data`, {
-      params: { page, limit, search }
-    });
-    return response.data;
+      params: { page, limit, search },
+    })
+    return response.data
   } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
+    console.error("Error fetching data:", error)
+    throw error
   }
-};
+}
 
 export const saveSelections = async (selections: number[]) => {
   try {
-    await axios.post(`${API_URL}/selections`, { selections });
+    await axios.post(`${API_URL}/selections`, { selections })
   } catch (error) {
-    console.error('Error saving selections:', error);
-    throw error;
+    console.error("Error saving selections:", error)
+    throw error
   }
-};
+}
 
 export const getSelections = async (): Promise<number[]> => {
   try {
-    const response = await axios.get(`${API_URL}/selections`);
-    return response.data.selections;
+    const response = await axios.get(`${API_URL}/selections`)
+    return response.data.selections
   } catch (error) {
-    console.error('Error getting selections:', error);
-    return [];
+    console.error("Error getting selections:", error)
+    return []
   }
-};
+}
 
 export const saveSortOrder = async (order: number[]) => {
   try {
-    await axios.post(`${API_URL}/sort-order`, { order });
+    await axios.post(`${API_URL}/sort-order`, { order })
   } catch (error) {
-    console.error('Error saving sort order:', error);
-    throw error;
+    console.error("Error saving sort order:", error)
+    throw error
   }
-};
+}
 
 export const getSortOrder = async (): Promise<number[]> => {
   try {
-    const response = await axios.get(`${API_URL}/sort-order`);
-    return response.data.order;
+    const response = await axios.get(`${API_URL}/sort-order`)
+    return response.data.order
   } catch (error) {
-    console.error('Error getting sort order:', error);
-    return [];
+    console.error("Error getting sort order:", error)
+    return []
   }
-};
+}
