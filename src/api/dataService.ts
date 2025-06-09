@@ -1,46 +1,56 @@
 import axios from 'axios';
-import { DataItem } from '../types';
+import type { DataItem } from '../types';
 
-const API_URL = '/api';
+const API_URL = import.meta.env.PROD 
+  ? '/.netlify/functions/api'
+  : 'http://localhost:3001/api';
 
-export const fetchData = async (page: number, limit: number = 20): Promise<{
-  data: DataItem[];
-  total: number;
-  hasMore: boolean;
-}> => {
-  const response = await axios.get(`${API_URL}/data`, { 
-    params: { page, limit } 
-  });
-  return response.data;
+export const fetchData = async (page: number, limit: number, search: string = '') => {
+  try {
+    const response = await axios.get(`${API_URL}/data`, {
+      params: { page, limit, search }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
 };
 
-export const searchData = async (query: string, page: number, limit: number = 20): Promise<{
-  data: DataItem[];
-  total: number;
-  hasMore: boolean;
-}> => {
-  const response = await axios.get(`${API_URL}/search`, { 
-    params: { query, page, limit } 
-  });
-  return response.data;
+export const saveSelections = async (selections: number[]) => {
+  try {
+    await axios.post(`${API_URL}/selections`, { selections });
+  } catch (error) {
+    console.error('Error saving selections:', error);
+    throw error;
+  }
 };
 
-export const saveSelectedItems = async (selected: number[]): Promise<{ success: boolean; count: number }> => {
-  const response = await axios.post(`${API_URL}/selected`, { selected });
-  return response.data;
+export const getSelections = async (): Promise<number[]> => {
+  try {
+    const response = await axios.get(`${API_URL}/selections`);
+    return response.data.selections;
+  } catch (error) {
+    console.error('Error getting selections:', error);
+    return [];
+  }
 };
 
-export const getSelectedItems = async (): Promise<{ selected: number[] }> => {
-  const response = await axios.get(`${API_URL}/selected`);
-  return response.data;
+export const saveSortOrder = async (order: number[]) => {
+  try {
+    await axios.post(`${API_URL}/sort-order`, { order });
+  } catch (error) {
+    console.error('Error saving sort order:', error);
+    throw error;
+  }
 };
 
-export const saveSortOrder = async (order: number[]): Promise<{ success: boolean }> => {
-  const response = await axios.post(`${API_URL}/sortorder`, { order });
-  return response.data;
-};
-
-export const getSortOrder = async (): Promise<{ order: number[] }> => {
-  const response = await axios.get(`${API_URL}/sortorder`);
-  return response.data;
+export const getSortOrder = async (): Promise<number[]> => {
+  try {
+    const response = await axios.get(`${API_URL}/sort-order`);
+    return response.data.order;
+  } catch (error) {
+    console.error('Error getting sort order:', error);
+    return [];
+  }
 };
